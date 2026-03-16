@@ -1,7 +1,7 @@
 import streamlit as st
 import sqlite3
 from datetime import date, timedelta
-import difflib
+import difflib #this libary is used directly from python for lexical text similarity
 import os
 import re
 import random
@@ -255,7 +255,7 @@ def parse_rca_docx(uploaded_file):
         "full_text": "\n".join(items),
     }
 
-# ---------------------- AI similarity ----------------------
+# ---------------------- THIS FUNCTION IS THE ACTUAL NLP/AI LIKE MATCHING LOGIC ----------------------
 def top_similar_rcas(query_text: str, topk=8, oem_filter: str | None = None):
     rcas = query_rows("SELECT rca_id, oem, environment, title, root_cause, created_at, status FROM rcas")
     if oem_filter:
@@ -267,7 +267,7 @@ def top_similar_rcas(query_text: str, topk=8, oem_filter: str | None = None):
     scored = []
     for r in rcas:
         combined = f"{r.get('title','')} {r.get('root_cause','')}".strip()
-        score = difflib.SequenceMatcher(None, query_text.lower(), combined.lower()).ratio()
+        score = difflib.SequenceMatcher(None, query_text.lower(), combined.lower()).ratio() #THIS IS THE MAIN KEY LINE WHERE THE SIMILARITY SCORE IS CALCULATED. 
         scored.append({**r, "similarity": score})
 
     scored.sort(key=lambda x: x["similarity"], reverse=True)
